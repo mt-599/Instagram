@@ -8,6 +8,18 @@
 import UIKit
 import Firebase
 
+struct Comment{
+    var text: String
+    var name: String
+    
+    func getText() -> String{
+        return text
+    }
+    func getName() -> String{
+        return name
+    }
+}
+
 class PostData: NSObject {
     var id: String
     var name: String?
@@ -15,7 +27,9 @@ class PostData: NSObject {
     var date: Date?
     var likes: [String] = []
     var isLiked: Bool = false
-    
+    var commentText: [String] = []
+    var commentUserName: [String] = []
+
     init(document: QueryDocumentSnapshot) {
         self.id = document.documentID
         let postDic = document.data()
@@ -26,6 +40,12 @@ class PostData: NSObject {
         
         if let likes = postDic["likes"] as? [String] {
             self.likes = likes
+        }
+        if let text = postDic["commentText"] as? [String] {
+            self.commentText = text
+        }
+        if let name = postDic["commentUserName"] as? [String] {
+            self.commentUserName = name
         }
         if let myid = Auth.auth().currentUser?.uid {
             //likesの配列の中にmyidが含まれているかチェックすることで、自分がいいねを押しているかを判断

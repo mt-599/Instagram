@@ -14,7 +14,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     //投稿データを格納する配列
     var postArray: [PostData] = []
-    
+    //コメントを格納する
+    var inputComment: String = ""
     //Firestoreのリスナー
     var listener: ListenerRegistration?
     
@@ -27,12 +28,12 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         //カスタムセルを登録する
         let nib = UINib(nibName: "PostTableViewCell", bundle: nil)
         tableView.register(nib, forCellReuseIdentifier: "Cell")
-        // Do any additional setup after loading the view.
+        // Do any additional setup after loading the view.        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        print("DEBUG_PRINT: viewWillAppear")
+        print("DEBUG_PRINT: Home viewWillAppear")
         //ログイン済みか確認
         if Auth.auth().currentUser != nil {
             //listenerを登録して投稿データの更新を監視する
@@ -72,7 +73,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         //セル内のボタンのアクションをソースコードで設定する
         cell.likeButton.addTarget(self, action: #selector(handleButton(_:forEvent:)), for: .touchUpInside)
-        
+        cell.commentButton.addTarget(self, action: #selector(handleInputCommentButton(_:forEvent:)), for: .touchUpInside)
+        cell.dispCommentButton.addTarget(self, action: #selector(handleDispCommentButton(_:forEvent:)), for: .touchUpInside)
         return cell
     }
     
@@ -104,6 +106,43 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
     }
     
+    @objc func handleInputCommentButton(_ sender: UIButton, forEvent event: UIEvent) {
+        print("InputCommentボタンがタップされました")
+        
+        //タップされたセルのインデックスを求める
+        let touch = event.allTouches?.first
+        let point = touch!.location(in: self.tableView)
+        let indexPath = tableView.indexPathForRow(at: point)
+
+        //配列からタップされたインデックスのデータを取り出す
+        let postData = postArray[indexPath!.row]
+        //コメント入力画面のインスタンス取得
+        let inputCommentViewController = self.storyboard?.instantiateViewController(withIdentifier: "Comment") as! InputCommentViewController
+        inputCommentViewController.modalPresentationStyle = .fullScreen
+        //コメントデータを更新するために、documentIDとコメント内容とユーザー名をComment画面に渡す
+        inputCommentViewController.docID = postData.id
+        inputCommentViewController.textArray = postData.commentText
+        inputCommentViewController.nameArray = postData.commentUserName
+        self.present(inputCommentViewController, animated: true, completion: nil)
+    }
+
+    @objc func handleDispCommentButton(_ sender: UIButton, forEvent event: UIEvent) {
+        print("DispCommentボタンがタップされました")
+        
+        //タップされたセルのインデックスを求める
+        let touch = event.allTouches?.first
+        let point = touch!.location(in: self.tableView)
+        let indexPath = tableView.indexPathForRow(at: point)
+
+        //配列からタップされたインデックスのデータを取り出す
+        let postData = postArray[indexPath!.row]
+        //コメント入力画面のインスタンス取得
+        let commentViewController = self.storyboard?.instantiateViewController(withIdentifier: "DispComment") as! CommentViewController
+        commentViewController.modalPresentationStyle = .fullScreen
+        //PostDataごとComment表示画面に渡すために設定
+        commentViewController.postData = postData
+        self.present(commentViewController, animated: true, completion: nil)
+    }
     /*
     // MARK: - Navigation
 
