@@ -74,7 +74,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         //セル内のボタンのアクションをソースコードで設定する
         cell.likeButton.addTarget(self, action: #selector(handleButton(_:forEvent:)), for: .touchUpInside)
         cell.commentButton.addTarget(self, action: #selector(handleInputCommentButton(_:forEvent:)), for: .touchUpInside)
-        cell.dispCommentButton.addTarget(self, action: #selector(handleDispCommentButton(_:forEvent:)), for: .touchUpInside)
         return cell
     }
     

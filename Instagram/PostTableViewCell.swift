@@ -16,17 +16,24 @@ class PostTableViewCell: UITableViewCell{
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var captionLabel: UILabel!
     @IBOutlet weak var commentButton: UIButton!
-    @IBOutlet weak var dispCommentButton: UIButton!
+    @IBOutlet weak var verticalStackView: UIStackView!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
     }
-
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
     }
     
+    override func prepareForReuse() {
+        let subviews = verticalStackView.subviews
+        for subview in subviews {
+            subview.removeFromSuperview()
+        }
+    }
     //PostDataの内容をセルに表示
     func setPostData(_ postData: PostData) {
         //画像の表示
@@ -57,6 +64,28 @@ class PostTableViewCell: UITableViewCell{
         } else {
             let buttonImage = UIImage(named: "like_none")
             self.likeButton.setImage(buttonImage, for: .normal)
+        }
+        
+        //コメントと名前表示
+        //UILabel作成
+        print("DEBUG_PRINT: \(postData.commentText.count)")
+        for i in 0 ..< postData.commentText.count{
+            //名前とコメントを水平方向に並べるためにUIStackViewを作成する
+            let horizontalStackView = UIStackView(frame: .zero)
+            horizontalStackView.axis = .horizontal
+            horizontalStackView.alignment = .center
+            horizontalStackView.distribution = .fillEqually
+            horizontalStackView.spacing = 20
+            horizontalStackView.translatesAutoresizingMaskIntoConstraints = false
+            verticalStackView.addArrangedSubview(horizontalStackView)
+            //名前表示
+            let nameLabel = UILabel()
+            nameLabel.text = postData.commentUserName[i]
+            horizontalStackView.addArrangedSubview(nameLabel)
+            //コメント表示
+            let commentLabel = UILabel()
+            commentLabel.text = postData.commentText[i]
+            horizontalStackView.addArrangedSubview(commentLabel)
         }
     }
 }
